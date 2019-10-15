@@ -1,3 +1,49 @@
+# Steps to use
+
+## Prerequisites
+- Hadoop 2.2 or later cluster or Sandbox.
+- Apache Hive.
+- Between 15 minutes and 2 days to generate data (depending on the Scale Factor you choose and available hardware).
+- If you plan to generate 1TB or more of data, using Apache Hive 13+ to generate the data is STRONGLY suggested.
+- Have ```gcc``` in installed your system path. If your system does not have it, install it using yum or apt-get.
+
+## Build the benchmark
+Build the benchmark you want to use (do all the prerequisites)
+```
+./tpcds-build.sh
+```
+or 
+```
+./tpch-build.sh
+```
+## Generate the tables
+Decide how much data you want. SCALE approximately is about # ~GB.
+Go into `util_tablegen.sh`
+- Change the `BENCHMARK` to the one you want (`./tpcds-setup.sh` or `./tpch-build.sh`)
+- Add/change your desired `SCALE`
+- Run the table orc gen (might take a while)
+- Come back later. `nohup` allows you to close the ssh session
+```
+nohup sh util_tablegen.sh
+```
+## Run all the queries
+Go into `util_(benchmark name).sh`
+- Change the `SCALE`. **Must be the SAME as before or else it can't find the database name!**
+- Add or change your desired `settings.sql` file or path
+- Change other parameters as needed (probably don't need)
+- Run the queries!
+- **If you expect it to take long, add:** `nohup`
+- Come back later.
+
+**TPC-DS Benchmark**
+```
+sh util_runtpcds.sh
+```
+**TPC-H Benchmark**
+```
+sh util_runtpch.sh
+```
+
 hive-testbench
 ==============
 
