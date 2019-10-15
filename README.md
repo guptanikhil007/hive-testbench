@@ -8,6 +8,9 @@
 - Have ```gcc``` in installed your system path. If your system does not have it, install it using yum or apt-get.
 
 ## Build the benchmark
+```
+git clone https://github.com/kcheeeung/hive-testbench.git
+```
 Build the benchmark you want to use (do all the prerequisites)
 ```
 ./tpcds-build.sh

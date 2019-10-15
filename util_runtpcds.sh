@@ -28,7 +28,6 @@ echo "Run queries for TPC-DS at scale "$SCALE > $CLOCK_FILE
 echo TZ='America/Los_Angeles' date >> $CLOCK_FILE
 
 # generate time report
-echo TZ='America/Los_Angeles' date > $REPORT_NAME
 echo "query #", "start time", "end time", "secs elapsed", "status" >> $REPORT_NAME
 echo "New report generated. Old report was removed"
 
@@ -67,7 +66,6 @@ for (( i = $START; i <= $END; i++ )); do
     # report status to terminal
     echo "query"$i": "$status
 done
-TZ='America/Los_Angeles' date >> $REPORT_NAME
 
 echo "Finished" >> $CLOCK_FILE
 TZ='America/Los_Angeles' date >> $CLOCK_FILE
