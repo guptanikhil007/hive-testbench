@@ -13,6 +13,10 @@ SCALE=10
 CLOCK_FILE="aaa_clocktime.txt"
 
 
+if [[ -f $CLOCK_FILE ]]; then
+    rm $CLOCK_FILE
+    echo "Old clock removed"
+fi
 echo "Created new clock"
 echo "Table gen time for "$BENCHMARK" "$SCALE > $CLOCK_FILE
 

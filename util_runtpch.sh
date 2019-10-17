@@ -23,9 +23,13 @@ HOSTNAME=`hostname`
 CLOCK_FILE="aaa_clocktime.txt"
 
 
+if [[ -f $CLOCK_FILE ]]; then
+    rm $CLOCK_FILE
+    echo "Old clock removed"
+fi
 echo "Created new clock"
 echo "Run queries for TPC-H at scale "$SCALE > $CLOCK_FILE
-echo TZ='America/Los_Angeles' date >> $CLOCK_FILE
+TZ='America/Los_Angeles' date >> $CLOCK_FILE
 
 # generate time report
 echo "query #", "start time", "end time", "secs elapsed", "status" >> $REPORT_NAME
