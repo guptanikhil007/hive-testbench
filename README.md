@@ -22,7 +22,14 @@ or
 ## Generate the tables
 Decide how much data you want. SCALE approximately is about # ~GB.
 Go into `util_tablegen.sh`
-- Change the `BENCHMARK` to the one you want (`./tpcds-setup.sh` or `./tpch-build.sh`)
+- Change the `BENCHMARK` to the one you want
+```
+./tpcds-setup.sh
+```
+or 
+```
+./tpch-setup.sh
+```
 - Add/change your desired `SCALE`
 - Run the table orc gen (might take a while)
 - Come back later. `nohup` allows you to close the ssh session

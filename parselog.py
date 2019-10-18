@@ -23,7 +23,7 @@ def parse_log(path, infoLog, comp_unit):
     with open(path, "r") as file:
         for line in file:
             # Mark the log you want
-            if "LLAP IO Summary" in line:
+            if not targetInfo and "LLAP IO Summary" in line:
                 targetInfo = True
             # Capture log info. Skip number of lines until reach desired info
             elif targetInfo and skipped < 3:
@@ -82,8 +82,7 @@ def main():
     # write info for each query
     for i in range(START, END + 1):
         infoLog = list()
-        path = BASE_LOG_NAME + str(i) + LOG_EXT
-        parse_log(path, infoLog, comp_unit)
+        parse_log(BASE_LOG_NAME + str(i) + LOG_EXT, infoLog, comp_unit)
         write_csv(i, infoLog)
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Run and time the benchmark without baby sitting the scripts
 # Use: nohup
 
@@ -14,7 +13,7 @@ QUERY_FILE_EXT=".sql"
 SETTINGS_PATH="settings.sql"
 
 # report name
-REPORT_NAME="time_elapsed_tpcds.csv"
+REPORT_NAME="time_elapsed_tpcds"
 # database name
 DATABASE="tpcds_bin_partitioned_orc_"$SCALE
 # hostname
@@ -32,7 +31,11 @@ echo "Run queries for TPC-DS at scale "$SCALE > $CLOCK_FILE
 TZ='America/Los_Angeles' date >> $CLOCK_FILE
 
 # generate time report
-echo "query #", "start time", "end time", "secs elapsed", "status" >> $REPORT_NAME
+if [[ -f $REPORT_NAME*".csv" ]]; then
+    rm $REPORT_NAME*".csv"
+    echo "Old report removed"
+fi
+echo "query #", "secs elapsed", "status" > $REPORT_NAME".csv"
 echo "New report generated. Old report was removed"
 
 # clear and make new log directory
@@ -66,10 +69,16 @@ for (( i = $START; i <= $END; i++ )); do
     # calculate time
     secs_elapsed="$(($END_TIME - $START_TIME))"
     # record data
-    echo $i, $START_TIME, $END_TIME, $secs_elapsed, $status >> $REPORT_NAME
+    echo $i, $secs_elapsed, $status >> $REPORT_NAME".csv"
     # report status to terminal
     echo "query"$i": "$status
 done
 
 echo "Finished" >> $CLOCK_FILE
 TZ='America/Los_Angeles' date >> $CLOCK_FILE
+
+python3 parselog.py
+
+ID=`date +%s`
+mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
+zip "tpcds-"$SCALE"GB-"$ID".zip" log_query/* $REPORT_NAME$ID".csv" "llapio_summary.csv"
