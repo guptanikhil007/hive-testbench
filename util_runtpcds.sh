@@ -31,12 +31,14 @@ echo "Run queries for TPC-DS at scale "$SCALE > $CLOCK_FILE
 TZ='America/Los_Angeles' date >> $CLOCK_FILE
 
 # generate time report
-if [[ -f $REPORT_NAME*".csv" ]]; then
-    rm $REPORT_NAME*".csv"
-    echo "Old report removed"
-fi
+rm $REPORT_NAME*".csv"
+echo "Old report removed"
 echo "query #", "secs elapsed", "status" > $REPORT_NAME".csv"
-echo "New report generated. Old report was removed"
+echo "New report generated"
+
+# remove old llapio_summary
+rm "llapio_summary"*".csv"
+echo "Old llapio_summary*.csv removed"
 
 # clear and make new log directory
 if [[ -d log_query/ ]]; then
@@ -79,6 +81,6 @@ TZ='America/Los_Angeles' date >> $CLOCK_FILE
 
 python3 parselog.py
 
-ID=`date +%s`
+ID=`TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M"`
 mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
-zip "tpcds-"$SCALE"GB-"$ID".zip" log_query/* $REPORT_NAME$ID".csv" "llapio_summary.csv"
+zip "tpcds-"$SCALE"GB-"$ID".zip" log_query/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv"

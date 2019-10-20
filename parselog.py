@@ -1,4 +1,4 @@
-import time, csv, re, os
+import time, csv, re, os, datetime
 
 """ Log location """
 BASE_LOG_NAME = "log_query/logquery"
@@ -61,20 +61,22 @@ def write_csv(log_num, infoLog):
     """
         Writes info to a csv file.
     """
-    with open("llapio_summary.csv", "a", newline="") as output_csv:
+    with open(OUT_NAME, "a", newline="") as output_csv:
         writer = csv.writer(output_csv)
         writer.writerow(["QUERY " + str(log_num)])
         for info in infoLog:
             writer.writerow(info)
 
 OUT_SIZE = OUT_FILE_SIZE.upper()
+os.environ["TZ"]="US/Pacific"
+time_id = datetime.datetime.now().strftime("%m.%d.%Y-%H.%M")
+OUT_NAME = "llapio_summary" + time_id + ".csv"
 def main():
-    """ THIS WILL OVERWRITE OLD LOGS """
     # 2^0 2^10, 2^20, 2^30, 2^40, 2^50
     comp_unit = {"B": 1, "KB": 1024, "MB": 1048576, "GB": 1073741824, "TB": 1099511627776, "PB": 1125899906842624}
 
     # write header
-    with open("llapio_summary.csv", "w", newline="") as output_csv:
+    with open(OUT_NAME, "w", newline="") as output_csv:
         writer = csv.writer(output_csv)
         head = ["VERTICES", "ROWGROUPS", "META_HIT", "META_MISS", "DATA_HIT({0})".format(OUT_SIZE), "DATA_MISS({0})".format(OUT_SIZE), "ALLOCATION({0})".format(OUT_SIZE), "USED({0})".format(OUT_SIZE), "TOTAL_IO(s)"]
         writer.writerow(head)
