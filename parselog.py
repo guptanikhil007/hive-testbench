@@ -1,18 +1,15 @@
 import time, csv, re, os, datetime
 
 """ Log location """
-BASE_LOG_NAME = "log_query/logquery"
+LOG_FOLDER = "log_query/"
+BASE_LOG_NAME = "logquery"
 LOG_EXT = ".txt"
-
-""" Range of queries """
-START = 1
-END = 99
 
 """"
 Output File Size Options:
 b, kb, mb, gb, tb, pb
 """
-OUT_FILE_SIZE = "mb"
+OUT_FILE_SIZE = "GB"
 
 def parse_log(path, infoLog, comp_unit):
     """
@@ -72,6 +69,13 @@ os.environ["TZ"]="US/Pacific"
 time_id = datetime.datetime.now().strftime("%m.%d.%Y-%H.%M")
 OUT_NAME = "llapio_summary" + time_id + ".csv"
 def main():
+    """ Range of queries. Counts the files so you don't need to know which benchmark it is """
+    START = 1
+    END = 0
+    for file in os.listdir(LOG_FOLDER):
+        if file.startswith(BASE_LOG_NAME) and file.endswith(LOG_EXT):
+            END += 1
+
     # 2^0 2^10, 2^20, 2^30, 2^40, 2^50
     comp_unit = {"B": 1, "KB": 1024, "MB": 1048576, "GB": 1073741824, "TB": 1099511627776, "PB": 1125899906842624}
 
@@ -84,7 +88,7 @@ def main():
     # write info for each query
     for i in range(START, END + 1):
         infoLog = list()
-        parse_log(BASE_LOG_NAME + str(i) + LOG_EXT, infoLog, comp_unit)
+        parse_log(LOG_FOLDER + BASE_LOG_NAME + str(i) + LOG_EXT, infoLog, comp_unit)
         write_csv(i, infoLog)
 
 if __name__ == "__main__":
