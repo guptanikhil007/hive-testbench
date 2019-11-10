@@ -11,12 +11,15 @@ b, kb, mb, gb, tb, pb
 """
 OUT_FILE_SIZE = "GB"
 
-def parse_log(path, infoLog, comp_unit):
+
+def parse_log(path, infoLog, comp_unit, cacheHitRatios):
     """
         Parses the target log. File size is converted into OUT_FILE_SIZE
     """
     targetInfo = False
     skipped = 0
+    cacheHit = 0
+    cacheTotal = 0
     with open(path, "r") as file:
         for line in file:
             # Mark the log you want
@@ -48,11 +51,20 @@ def parse_log(path, infoLog, comp_unit):
                                 pass
                     # make csv pretty
                     tempStr = temp[0] + temp[1]
-                    del temp[0]
-                    del temp[1]
+                    del temp[0] # deletes "Map/Reducer"
+                    del temp[0] # deletes "Map/Reducer NUMBER"
                     temp.insert(0, tempStr)
+                    cacheHit += temp[4]
+                    cacheTotal += (temp[4] + temp[5])
                     # append to infoLog
                     infoLog.append(temp)
+        # calculate and append cache hit ratio
+        if cacheHit != 0 and cacheTotal != 0:
+            # query success
+            cacheHitRatios.append(cacheHit / cacheTotal * 100)
+        else:
+            # query failed
+            cacheHitRatios.append(0)
 
 def write_csv(log_num, infoLog):
     """
@@ -60,9 +72,34 @@ def write_csv(log_num, infoLog):
     """
     with open(OUT_NAME, "a", newline="") as output_csv:
         writer = csv.writer(output_csv)
-        writer.writerow(["QUERY " + str(log_num)])
+        # includes padding for cachehitratio
+        writer.writerow(["QUERY " + str(log_num), "", "", "", "", "", "", "", ""])
+        # write info
         for info in infoLog:
             writer.writerow(info)
+
+def write_csv_cacheHitRatios(cacheHitRatios):
+    """
+        Processes the cache hit ratio information with the csv
+    """
+    # load the csv into memory
+    all_rows = list()
+    with open(OUT_NAME, "r") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            all_rows.append(row)
+
+    # process cache hit ratios into list
+    all_rows[0].append("Cache Hit Ratio (%)")
+    for i in range(len(cacheHitRatios)):
+        all_rows[1 + i].append(cacheHitRatios[i])
+
+    # rewrite the csv
+    with open(OUT_NAME, "w", newline="") as file:
+        writer = csv.writer(file)
+        for row in all_rows:
+            writer.writerow(row)
+
 
 OUT_SIZE = OUT_FILE_SIZE.upper()
 os.environ["TZ"]="US/Pacific"
@@ -82,15 +119,20 @@ def main():
     # write header
     with open(OUT_NAME, "w", newline="") as output_csv:
         writer = csv.writer(output_csv)
-        head = ["VERTICES", "ROWGROUPS", "META_HIT", "META_MISS", "DATA_HIT({0})".format(OUT_SIZE), "DATA_MISS({0})".format(OUT_SIZE), "ALLOCATION({0})".format(OUT_SIZE), "USED({0})".format(OUT_SIZE), "TOTAL_IO(s)"]
+        head = ["VERTICES", "ROWGROUPS", "META_HIT", "META_MISS", "DATA_HIT({0})".format(OUT_SIZE),\
+                "DATA_MISS({0})".format(OUT_SIZE), "ALLOCATION({0})".format(OUT_SIZE), "USED({0})".format(OUT_SIZE), "TOTAL_IO(s)"]
         writer.writerow(head)
 
     # write info for each query
+    cacheHitRatios = list()
     for i in range(START, END + 1):
         infoLog = list()
-        parse_log(LOG_FOLDER + BASE_LOG_NAME + str(i) + LOG_EXT, infoLog, comp_unit)
+        parse_log(LOG_FOLDER + BASE_LOG_NAME + str(i) + LOG_EXT, infoLog, comp_unit, cacheHitRatios)
         write_csv(i, infoLog)
 
+    # write the cache hit ratios
+    write_csv_cacheHitRatios(cacheHitRatios)
+    
 if __name__ == "__main__":
     start = time.time()
     main()
