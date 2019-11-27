@@ -2,19 +2,17 @@
 
 # NOT MEANT TO BE RUN STAND ALONE
 # Takes in:
-# 1. Beeline command to run
-# 2. Log path for beeline to output
-# 3. Query Number
-# 4. CSV name
 
-INTERNAL_BEELINE_COMMAND=$1
-INTERNAL_LOG_PATH=$2
-INTERNAL_QID=$3
-INTERNAL_CSV=$4
+INTERNAL_DATABASE=$1
+INTERNAL_SETTINGSPATH=$2
+INTERNAL_QUERYPATH=$3
+INTERNAL_LOG_PATH=$4
+INTERNAL_QID=$5
+INTERNAL_CSV=$6
 
 # Beeline command to execute
 START_TIME="`date +%s`"
-$INTERNAL_BEELINE_COMMAND &>> $INTERNAL_LOG_PATH
+beeline -u "jdbc:hive2://`hostname`:10001/$INTERNAL_DATABASE;transportMode=http" -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
 RETURN_VAL=$?
 END_TIME="`date +%s`"
 

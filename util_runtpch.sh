@@ -50,6 +50,9 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     mkdir log_query/
     echo "Log folder generated"
 
+    # make executable
+    chmod 777 util_internalRunQuery.sh
+
     # range of queries
     START=1
     END=22
@@ -59,7 +62,7 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
         BEELINE_COMMAND="beeline -u jdbc:hive2://$HOSTNAME:10001/$DATABASE;transportMode=http -i $SETTINGS_PATH -f $query_path"
         LOG_PATH="log_query/logquery$i.txt"
 
-        sh util_internalRunQuery.sh "$BEELINE_COMMAND" "$LOG_PATH" "$i" "$REPORT_NAME.csv"
+        ./util_internalRunQuery.sh "$BEELINE_COMMAND" "$LOG_PATH" "$i" "$REPORT_NAME.csv"
 
     done
 

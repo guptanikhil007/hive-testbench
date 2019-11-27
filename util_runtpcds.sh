@@ -50,25 +50,33 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     mkdir log_query/
     echo "Log folder generated"
 
+    # make executable
+    chmod +x util_internalGetPAT.sh
+    chmod +x util_internalRunQuery.sh
+    chmod -R +x PAT/
+
+    # absolute path
+    CURR_DIR="`pwd`/"
+
+    ID=`TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M"`
     # range of queries
     START=1
-    END=99
+    END=1
     for (( i = $START; i <= $END; i++ )); do
         query_path=($QUERY_BASE_NAME$i$QUERY_FILE_EXT)
-        
-        BEELINE_COMMAND="beeline -u jdbc:hive2://$HOSTNAME:10001/$DATABASE;transportMode=http -i $SETTINGS_PATH -f $query_path"
         LOG_PATH="log_query/logquery$i.txt"
 
-        sh util_internalRunQuery.sh "$BEELINE_COMMAND" "$LOG_PATH" "$i" "$REPORT_NAME.csv"
-        
+        # ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv"
+
+        # See util_internalGetPAT
+        ./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv" run"$ID"/query"$i"PAT/
+
     done
 
     echo "Finished" >> $CLOCK_FILE
     TZ='America/Los_Angeles' date >> $CLOCK_FILE
 
     python3 parselog.py
-
-    ID=`TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M"`
     mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
     zip "tpcds-"$SCALE"GB-"$ID".zip" log_query/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv"
 else
