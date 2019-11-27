@@ -1,4 +1,4 @@
--- set hivevar:DB=tpcds_bin_partitioned_orc_10000
+use ${DB};
 
 alter table customer_address add constraint ${DB}_pk_ca primary key (ca_address_sk) disable novalidate rely;
 alter table customer_demographics add constraint ${DB}_pk_cd primary key (cd_demo_sk) disable novalidate rely;

@@ -70,13 +70,12 @@ hadoop fs -chmod -R 777  ${DIR}/${SCALE}
 
 echo "TPC-DS text data generation complete."
 
-# HIVE="beeline -n hive -u 'jdbc:hive2://localhost:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default' "
 HOSTNAME_A=`hostname -f`
-HIVE="beeline -u 'jdbc:hive2://$HOSTNAME_A:10001/;transportMode=http'"
+BEELINEURL="beeline -u 'jdbc:hive2://$HOSTNAME_A:10001/;transportMode=http'"
 
 # Create the text/flat tables as external tables. These will be later be converted to ORCFile.
 echo "Loading text data into external tables."
-runcommand "$HIVE  -i settings/load-flat.sql -f ddl-tpcds/text/alltables.sql --hivevar DB=tpcds_text_${SCALE} --hivevar LOCATION=${DIR}/${SCALE}"
+runcommand "$BEELINEURL -i settings/load-flat.sql -f ddl-tpcds/text/alltables.sql --hivevar DB=tpcds_text_${SCALE} --hivevar LOCATION=${DIR}/${SCALE}"
 
 # Create the partitioned and bucketed tables.
 if [ "X$FORMAT" = "X" ]; then
@@ -100,7 +99,7 @@ REDUCERS=$((test ${SCALE} -gt ${MAX_REDUCERS} && echo ${MAX_REDUCERS}) || echo $
 # Populate the smaller tables.
 for t in ${DIMS}
 do
-	COMMAND="$HIVE  -i settings/load-partitioned.sql -f ddl-tpcds/bin_partitioned/${t}.sql \
+	COMMAND="$BEELINEURL -i settings/load-partitioned.sql -f ddl-tpcds/bin_partitioned/${t}.sql \
 	    --hivevar DB=tpcds_bin_partitioned_${FORMAT}_${SCALE} --hivevar SOURCE=tpcds_text_${SCALE} \
             --hivevar SCALE=${SCALE} \
 	    --hivevar REDUCERS=${REDUCERS} \
@@ -111,7 +110,7 @@ done
 
 for t in ${FACTS}
 do
-	COMMAND="$HIVE  -i settings/load-partitioned.sql -f ddl-tpcds/bin_partitioned/${t}.sql \
+	COMMAND="$BEELINEURL -i settings/load-partitioned.sql -f ddl-tpcds/bin_partitioned/${t}.sql \
 	    --hivevar DB=tpcds_bin_partitioned_${FORMAT}_${SCALE} \
             --hivevar SCALE=${SCALE} \
 	    --hivevar SOURCE=tpcds_text_${SCALE} --hivevar BUCKETS=${BUCKETS} \
@@ -124,6 +123,6 @@ make -j 1 -f $LOAD_FILE
 
 
 echo "Loading constraints"
-runcommand "$HIVE -f ddl-tpcds/bin_partitioned/add_constraints.sql --hivevar DB=tpcds_bin_partitioned_${FORMAT}_${SCALE}"
+runcommand "$BEELINEURL -f ddl-tpcds/bin_partitioned/add_constraints.sql --hivevar DB=tpcds_bin_partitioned_${FORMAT}_${SCALE}"
 
 echo "Data loaded into database ${DATABASE}."

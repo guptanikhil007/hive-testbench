@@ -69,7 +69,7 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
         # ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv"
 
         # See util_internalGetPAT
-        ./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv" run"$ID"/query"$i"PAT/
+        ./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv" tpcdsPAT"$ID"/query"$i"/
 
     done
 
@@ -79,7 +79,7 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     python3 parselog.py
     mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
     zip -j log_query.zip log_query/*
-    zip -r "tpcds-"$SCALE"GB-"$ID".zip" log_query.zip PAT/PAT-collecting-data/results/run"$ID"/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv"
+    zip -r "tpcds-"$SCALE"GB-"$ID".zip" log_query.zip PAT/PAT-collecting-data/results/tpcdsPAT"$ID"/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv"
     rm log_query.zip
 else
     echo "Invalid entry. Scale must also be greater than 1."
