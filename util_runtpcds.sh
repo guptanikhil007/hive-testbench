@@ -61,7 +61,7 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     ID=`TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M"`
     # range of queries
     START=1
-    END=1
+    END=99
     for (( i = $START; i <= $END; i++ )); do
         query_path=($QUERY_BASE_NAME$i$QUERY_FILE_EXT)
         LOG_PATH="log_query/logquery$i.txt"
@@ -78,7 +78,9 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
 
     python3 parselog.py
     mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
-    zip "tpcds-"$SCALE"GB-"$ID".zip" log_query/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv"
+    zip -j log_query.zip log_query/*
+    zip -r "tpcds-"$SCALE"GB-"$ID".zip" log_query.zip PAT/PAT-collecting-data/results/run"$ID"/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv"
+    rm log_query.zip
 else
     echo "Invalid entry. Scale must also be greater than 1."
 fi
