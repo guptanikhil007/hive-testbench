@@ -12,14 +12,7 @@
 git clone https://github.com/kcheeeung/hive-testbench.git
 ```
 
-## Connect Head to Worker Node (required for Performance Analysis Tool PAT)
-```
-sh util_connect.sh YOURPASSWORD
-```
-
-## New Cluster / Run Everything (still must do above steps)
-Run defaults to having the PAT on
-
+## New Cluster / Run Everything
 **TPC-DS**
 ```
 nohup sh util_lazyrun.sh tpcds SCALE
@@ -29,7 +22,9 @@ nohup sh util_lazyrun.sh tpcds SCALE
 nohup sh util_lazyrun.sh tpch SCALE
 ```
 
-## Build the benchmark
+# Individual Steps
+
+## 1. Build the benchmark
 Build the benchmark you want to use (do all the prerequisites)
 
 **TPC-DS**
@@ -41,10 +36,8 @@ Build the benchmark you want to use (do all the prerequisites)
 ./tpch-build.sh
 ```
 
-## Generate the tables
+## 2. Generate the tables
 Decide how much data you want. SCALE approximately is about # ~GB.
-- Run the table orc gen (might take a while)
-- Come back later. `nohup` allows you to close the ssh session
 
 **TPC-DS**
 ```
@@ -55,10 +48,10 @@ nohup sh util_tablegentpcds.sh SCALE
 nohup sh util_tablegentpch.sh SCALE
 ```
 
-## Run all the queries
+## 3. Run all the queries
 - `SCALE` **must be the SAME as before or else it can't find the database name!**
 - Add or change your desired `settings.sql` file or path
-- Run the queries! Come back later.
+- Run the queries!
 
 **TPC-DS Benchmark**
 ```
@@ -67,6 +60,21 @@ nohup sh util_runtpcds.sh SCALE
 **TPC-H Benchmark**
 ```
 nohup sh util_runtpch.sh SCALE
+```
+
+# Optional: Enable Performance Analysis Tool (PAT)
+## 1. Connect Head to Worker Node 
+```
+sh util_connect.sh YOURPASSWORD
+```
+
+## 2. Enable PAT
+Go into `util_runtpcds.sh` or `util_runtpch.sh`.
+Switch the command by un/commenting . Example below.
+```
+# ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv"
+
+./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv" tpchPAT"$ID"/query"$i"/
 ```
 
 # Troubleshooting
@@ -83,9 +91,6 @@ Add into the script you're running
 ```
 export DEBUG_SCRIPT=X
 ```
-
-## How to Disable PAT
-Go into `util_runtpcds.sh` or `util_runtpch.sh`. Comment out and switch the command lines.
 
 ## TPC-H is more stable than TPC-DS
 TPC-DS has some problems for large scales (100+). Pending to fix.
