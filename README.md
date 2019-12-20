@@ -70,11 +70,21 @@ sh util_connect.sh YOURPASSWORD
 
 ## 2. Enable PAT
 Go into `util_runtpcds.sh` or `util_runtpch.sh`.
-Switch the command by un/commenting . Example below.
+Switch the command by un/commenting. Example below.
 ```
 # ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv"
 
 ./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv" tpchPAT"$ID"/query"$i"/
+```
+
+# Optional: Run Queries using Different Connection 
+Go into `util_internalRunQuery.sh`
+Switch the command by un/commenting. Example below.
+Add the appropriate information (`CLUSTERNAME` and `PASSWORD`).
+```
+# beeline -u "jdbc:hive2://`hostname`:10001/$INTERNAL_DATABASE;transportMode=http" -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
+
+beeline -u "jdbc:hive2://CLUSTERNAME.azurehdinsight.net:443/$INTERNAL_DATABASE;ssl=true;transportMode=http;httpPath=/hive2" -n admin -p PASSWORD -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
 ```
 
 # Troubleshooting
@@ -90,6 +100,12 @@ ps -ef | grep sh
 Add into the script you're running
 ```
 export DEBUG_SCRIPT=X
+```
+
+## Could not find database?
+In the `settings.sql` file, add
+```
+use DATABASENAME;
 ```
 
 ## TPC-H is more stable than TPC-DS

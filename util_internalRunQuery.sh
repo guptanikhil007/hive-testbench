@@ -13,6 +13,9 @@ INTERNAL_CSV=$6
 # Beeline command to execute
 START_TIME="`date +%s`"
 beeline -u "jdbc:hive2://`hostname`:10001/$INTERNAL_DATABASE;transportMode=http" -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
+
+# beeline -u "jdbc:hive2://CLUSTERNAME.azurehdinsight.net:443/$INTERNAL_DATABASE;ssl=true;transportMode=http;httpPath=/hive2" -n admin -p PASSWORD -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
+
 RETURN_VAL=$?
 END_TIME="`date +%s`"
 
