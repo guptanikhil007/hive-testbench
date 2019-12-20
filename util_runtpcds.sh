@@ -58,7 +58,7 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     # absolute path
     CURR_DIR="`pwd`/"
 
-    ID=`TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M"`
+    ID=`TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M.%S"`
     # range of queries
     START=1
     END=99
