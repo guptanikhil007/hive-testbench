@@ -13,6 +13,8 @@ git clone https://github.com/kcheeeung/hive-testbench.git
 ```
 
 ## New Cluster / Run Everything
+Run all the individual steps. If you already have tables for a scale, just run step 3.
+
 **TPC-DS**
 ```
 nohup sh util_lazyrun.sh tpcds SCALE
@@ -93,7 +95,7 @@ beeline -u "jdbc:hive2://CLUSTERNAME.azurehdinsight.net:443/$INTERNAL_DATABASE;s
 Check the `aaa_clock.txt` or `aab_clock.txt` file.
 OR
 ```
-ps -ef | grep sh
+ps -ef | grep '\.sh'
 ```
 
 ## Some errors?
