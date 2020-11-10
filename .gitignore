@@ -1,6 +1,6 @@
 target/
-tpcds_kit.zip
-tpch_kit.zip
+# tpcds_kit.zip
+# tpch_kit.zip
 *.sql.log
 derby.log
 log_query/

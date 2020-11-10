@@ -4,24 +4,11 @@
 - Hadoop 2.2 or later cluster or Sandbox.
 - Apache Hive.
 - Between 15 minutes and 2 days to generate data (depending on the Scale Factor you choose and available hardware).
-- If you plan to generate 1TB or more of data, using Apache Hive 13+ to generate the data is STRONGLY suggested.
 - Have ```gcc``` in installed your system path. If your system does not have it, install it using yum or apt-get.
 
 ## Clone
 ```
-git clone https://github.com/kcheeeung/hive-testbench.git
-```
-
-## New Cluster / Run Everything
-Run all the individual steps. If you already have tables for a scale, just run step 3.
-
-**TPC-DS**
-```
-nohup sh util_lazyrun.sh tpcds SCALE
-```
-**TPC-H**
-```
-nohup sh util_lazyrun.sh tpch SCALE
+git clone https://github.com/kcheeeung/hive-testbench.git && cd hive-testbench/
 ```
 
 # Individual Steps
@@ -39,29 +26,34 @@ Build the benchmark you want to use (do all the prerequisites)
 ```
 
 ## 2. Generate the tables
-Decide how much data you want. SCALE approximately is about # ~GB.
+Decide how much data you want. `SCALE` approximately is about # ~GB. Supported `FORMAT` includes: `orc` and `parquet`.
 
+**Generic Usage**
+```
+nohup sh script.sh SCALE FORMAT
+```
 **TPC-DS**
 ```
-nohup sh util_tablegentpcds.sh SCALE
+nohup sh util_tablegentpcds.sh 10 orc
 ```
 **TPC-H**
 ```
-nohup sh util_tablegentpch.sh SCALE
+nohup sh util_tablegentpch.sh 10 orc
 ```
 
 ## 3. Run all the queries
-- `SCALE` **must be the SAME as before or else it can't find the database name!**
-- Add or change your desired `settings.sql` file or path
+- `SCALE` **must be the SAME size from an existing database!**
+- Modify your settings in `settings.sql`.
+- By default each query has a timeout it set to **2 hours!** Change in `util_internalRunQuery.sh` where `TIME_TO_TIMEOUT=120m`.
 - Run the queries!
 
 **TPC-DS Benchmark**
 ```
-nohup sh util_runtpcds.sh SCALE
+nohup sh util_runtpcds.sh 10 orc
 ```
 **TPC-H Benchmark**
 ```
-nohup sh util_runtpch.sh SCALE
+nohup sh util_runtpch.sh 10 orc
 ```
 
 # Optional: Enable Performance Analysis Tool (PAT)
@@ -80,35 +72,31 @@ Switch the command by un/commenting. Example below.
 ```
 
 # Optional: Run Queries using Different Connection 
-Go into `util_internalRunQuery.sh`
-Switch the command by un/commenting. Example below.
+Go into `util_internalRunQuery.sh`. Switch the command by uncommenting. Example below.
 Add the appropriate information (`CLUSTERNAME` and `PASSWORD`).
 ```
-# beeline -u "jdbc:hive2://`hostname`:10001/$INTERNAL_DATABASE;transportMode=http" -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
+# timeout $TIME_TO_TIMEOUT beeline -u "jdbc:hive2://`hostname -f`:10001/$INTERNAL_DATABASE;transportMode=http" -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
 
-beeline -u "jdbc:hive2://CLUSTERNAME.azurehdinsight.net:443/$INTERNAL_DATABASE;ssl=true;transportMode=http;httpPath=/hive2" -n admin -p PASSWORD -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
+timeout $TIME_TO_TIMEOUT beeline -u "jdbc:hive2://CLUSTERNAME.azurehdinsight.net:443/$INTERNAL_DATABASE;ssl=true;transportMode=http;httpPath=/hive2" -n admin -p PASSWORD -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
 ```
 
 # Troubleshooting
 
 ## Did my X step finish?
 Check the `aaa_clock.txt` or `aab_clock.txt` file.
-OR
 ```
-ps -ef | grep '\.sh'
-```
-
-## Some errors?
-Add into the script you're running
-```
-export DEBUG_SCRIPT=X
+ps -ef | grep .sh
+ps -ef | grep beeline
 ```
 
 ## Could not find database?
-In the `settings.sql` file, add
+In the `settings.sql` file, add.
 ```
 use DATABASENAME;
 ```
 
-## TPC-H is more stable than TPC-DS
-TPC-DS has some problems for large scales (100+). Pending to fix.
+## How to debug
+Uncomment the following line.
+```
+# DEBUG_SCRIPT=X
+```
