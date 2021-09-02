@@ -77,8 +77,8 @@ function runBenchmark() {
             query_path=(${QUERY_BASE_NAME}${QUERY_NUM}${QUERY_FILE_EXT})
             LOG_PATH="log_query/logquery${QUERY_NUM}.${j}.txt"
 
-            ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$QUERY_NUM" "$CURR_DIR$REPORT_NAME.csv"
-
+            ./util_internalRealRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$QUERY_NUM" "$CURR_DIR$REPORT_NAME.csv" "3"
+            # ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$QUERY_NUM" "$CURR_DIR$REPORT_NAME.csv"
             # ./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$QUERY_NUM" "$CURR_DIR$REPORT_NAME.csv" tpcdsPAT"$ID"/query"$i"/
         done
     done
